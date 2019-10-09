@@ -49,21 +49,24 @@ def token_for(_client):
                 'authorization': 'Bearer %s' % self.access_token
             })
 
-        def post(self, url, body = None, headers = {}, **kwargs):
+        def post(self, url, body = None, headers = None, timeout = None, **kwargs):
             body = kwargs if body is None else body
+            headers = {} if headers is None else headers
             if _contains_file(body):
                 files = [(k, v) for k, v in _items_or_iteritems(body) if _contains_file(v)]
                 data = [(k, v) for k, v in _items_or_iteritems(body) if not _contains_file(v)]
-                return Response(self.session.post(self._full_url(url), headers=headers, files=files, data=data, **kwargs))
+                return Response(self.session.post(self._full_url(url), headers=headers, files=files, data=data, timeout=timeout, **kwargs))
             else:
-                return Response(self.session.post(self._full_url(url), headers=headers, json=body, **kwargs))
+                return Response(self.session.post(self._full_url(url), headers=headers, json=body, timeout=timeout, **kwargs))
 
-        def get(self, url, params = None, headers = {}, **kwargs):
+        def get(self, url, params = None, headers = None, timeout = None, **kwargs):
+            headers = {} if headers is None else headers
             params = kwargs if params is None else params
-            return Response(self.session.get(self._full_url(url), headers=headers, params=params, **kwargs))
+            return Response(self.session.get(self._full_url(url), headers=headers, params=params, timeout=timeout, **kwargs))
 
-        def delete(self, url, params = None, headers = {}):
-            return Response(self.session.delete(self._full_url(url), headers=headers, params=params))
+        def delete(self, url, params = None, headers = None, timeout = None):
+            headers = {} if headers is None else headers
+            return Response(self.session.delete(self._full_url(url), headers=headers, params=params), timeout=timeout)
 
         def _full_url(self, path):
             if isinstance(path, dict):
